@@ -26,35 +26,37 @@ const SalesReport = () => {
   const [salesData, setSalesData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState("");
+
+  const fetchSalesReport = async (month = "") => {
+    setLoading(true);
+    setError(null);
+    try {
+      let url =
+        "https://srinivas-fireworks-backend.onrender.com/api/admin/getreport";
+      if (month) url += `?month=${month}`;
+      const response = await axios.get(url);
+      setSalesData(response.data);
+    } catch (err) {
+      setError("Error fetching sales report.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchSalesReport = async () => {
-      try {
-        const response = await axios.get(
-          "https://srinivas-fireworks-backend.onrender.com/api/admin/getreport"
-        );
-        setSalesData(response.data);
-        console.log(response.data);
-      } catch (err) {
-        setError("Error fetching sales report.");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSalesReport();
-  }, []);
+    fetchSalesReport(selectedMonth);
+  }, [selectedMonth]);
 
   if (loading) return <div className="text-center text-xl">Loading...</div>;
   if (error)
     return <div className="text-center text-xl text-red-500">{error}</div>;
 
   const { mostSoldCracker, totalRevenue, totalUnitsSold, salesByCracker } =
-    salesData;
+    salesData || {};
   const safeSalesByCracker = salesByCracker || [];
 
-  // Pie Chart Data for Most Sold Cracker
   const pieData = {
     labels: safeSalesByCracker.map((cracker) => cracker.name),
     datasets: [
@@ -78,7 +80,6 @@ const SalesReport = () => {
     ],
   };
 
-  // Bar Chart Data for Revenue by Cracker
   const barData = {
     labels: safeSalesByCracker.map((cracker) => cracker.name),
     datasets: [
@@ -93,20 +94,36 @@ const SalesReport = () => {
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-4xl font-bold text-center mb-6">Sales Report</h1>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <h1 className="text-3xl sm:text-4xl font-bold text-center mb-6">
+        Sales Report
+      </h1>
+
+      {/* Month Filter */}
+      <div className="mb-6 flex flex-col sm:flex-row justify-center items-center gap-4">
+        <label htmlFor="month" className="text-lg font-semibold">
+          Filter by Month:
+        </label>
+        <input
+          type="month"
+          id="month"
+          value={selectedMonth}
+          onChange={(e) => setSelectedMonth(e.target.value)}
+          className="border border-gray-300 rounded px-3 py-2"
+        />
+      </div>
 
       {/* Most Sold Cracker */}
       <div className="mb-8">
         <h2 className="text-2xl font-semibold mb-4">Most Sold Cracker</h2>
         {mostSoldCracker ? (
-          <div className="bg-white shadow-md rounded-lg p-6 flex items-center">
+          <div className="bg-white shadow-md rounded-lg p-6 flex flex-col sm:flex-row items-center">
             <img
-              className="w-32 h-32 object-cover rounded-full mr-6"
+              className="w-28 h-28 sm:w-32 sm:h-32 object-cover rounded-full mb-4 sm:mb-0 sm:mr-6"
               src={mostSoldCracker.image}
               alt={mostSoldCracker.name}
             />
-            <div>
+            <div className="text-center sm:text-left">
               <h3 className="text-xl font-semibold">{mostSoldCracker.name}</h3>
               <p className="text-sm text-gray-600">
                 Type: {mostSoldCracker.type}
@@ -124,16 +141,16 @@ const SalesReport = () => {
         )}
       </div>
 
-      {/* Total Revenue and Units Sold */}
+      {/* Totals */}
       <div className="mb-8">
         <h2 className="text-2xl font-semibold mb-4">Total Sales</h2>
-        <div className="bg-white shadow-md rounded-lg p-6">
+        <div className="bg-white shadow-md rounded-lg p-6 flex flex-col sm:flex-row justify-between items-center gap-4">
           <p className="text-lg">Total Revenue: ₹{totalRevenue}</p>
           <p className="text-lg">Total Units Sold: {totalUnitsSold}</p>
         </div>
       </div>
 
-      {/* Sales by Cracker */}
+      {/* Sales List */}
       <div className="mb-8">
         <h2 className="text-2xl font-semibold mb-4">Sales by Cracker</h2>
         {safeSalesByCracker.length === 0 ? (
@@ -143,14 +160,14 @@ const SalesReport = () => {
             {safeSalesByCracker.map((cracker) => (
               <li
                 key={cracker.name}
-                className="bg-white shadow-lg rounded-lg p-6 flex items-center"
+                className="bg-white shadow-lg rounded-lg p-6 flex flex-col sm:flex-row items-center"
               >
                 <img
-                  className="w-24 h-24 object-cover rounded-full mr-6"
+                  className="w-24 h-24 object-cover rounded-full mb-4 sm:mb-0 sm:mr-6"
                   src={cracker.image}
                   alt={cracker.name}
                 />
-                <div>
+                <div className="text-center sm:text-left">
                   <h3 className="text-xl font-semibold">{cracker.name}</h3>
                   <p className="text-sm text-gray-600">Type: {cracker.type}</p>
                   <p className="text-sm text-gray-600">
@@ -166,20 +183,23 @@ const SalesReport = () => {
         )}
       </div>
 
-      {/* Pie Chart */}
-      <div className="bg-white shadow-md rounded-lg p-6 mb-8">
-        <h3 className="text-2xl font-semibold mb-4">
-          Sales Distribution by Cracker
-        </h3>
-        <div className="mx-auto" style={{ width: "250px", height: "250px" }}>
+      {/* Charts */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-xl font-semibold mb-4 text-center">
+            Sales Distribution
+          </h3>
           <Pie data={pieData} />
         </div>
-      </div>
-
-      {/* Bar Chart */}
-      <div className="bg-white shadow-md rounded-lg p-6">
-        <h3 className="text-2xl font-semibold mb-4">Revenue by Cracker</h3>
-        <Bar data={barData} />
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-xl font-semibold mb-4 text-center">
+            Revenue by Cracker
+          </h3>
+          <Bar
+            data={barData}
+            options={{ responsive: true, maintainAspectRatio: false }}
+          />
+        </div>
       </div>
     </div>
   );

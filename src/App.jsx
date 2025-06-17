@@ -19,7 +19,7 @@ function AppContent() {
   return (
     <div className="flex">
       {!hideSidebar && <AdminSidebar />}
-      <div className={`flex-1 ${!hideSidebar ? "pl-[260px]" : ""}`}>
+      <div className={`flex-1 ${!hideSidebar ? "pl-[30px]" : ""}`}>
         <Routes>
           <Route path="/" element={<AdminLogin />} />
           <Route path="/admin/crackers" element={<CrackersPage />} />

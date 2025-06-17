@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom"; // Added useParams to get the cracker ID
+import { useNavigate, useParams } from "react-router-dom";
 
 const UpdateCracker = () => {
-  const { id } = useParams(); // Get the cracker ID from the URL params
+  const { id } = useParams();
   const [cracker, setCracker] = useState({
     name: "",
     price: "",
@@ -50,17 +50,20 @@ const UpdateCracker = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="px-4 py-6 sm:px-6 lg:px-8">
       <h1 className="text-3xl font-bold text-center mb-8">Update Cracker</h1>
-      <form onSubmit={handleUpdateCracker}>
-        <div className="mb-6">
+      <form
+        onSubmit={handleUpdateCracker}
+        className="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6"
+      >
+        <div className="grid grid-cols-1 gap-4">
           <input
             type="text"
             name="name"
             value={cracker.name}
             onChange={handleChange}
             placeholder="Cracker Name"
-            className="mb-4 p-2 border border-gray-300 rounded-md w-full"
+            className="p-2 border border-gray-300 rounded-md w-full"
           />
           <input
             type="text"
@@ -68,7 +71,7 @@ const UpdateCracker = () => {
             value={cracker.price}
             onChange={handleChange}
             placeholder="Cracker Price"
-            className="mb-4 p-2 border border-gray-300 rounded-md w-full"
+            className="p-2 border border-gray-300 rounded-md w-full"
           />
           <input
             type="text"
@@ -76,7 +79,7 @@ const UpdateCracker = () => {
             value={cracker.image}
             onChange={handleChange}
             placeholder="Image URL"
-            className="mb-4 p-2 border border-gray-300 rounded-md w-full"
+            className="p-2 border border-gray-300 rounded-md w-full"
           />
           <input
             type="text"
@@ -84,7 +87,7 @@ const UpdateCracker = () => {
             value={cracker.crackerType}
             onChange={handleChange}
             placeholder="Cracker Type"
-            className="mb-4 p-2 border border-gray-300 rounded-md w-full"
+            className="p-2 border border-gray-300 rounded-md w-full"
           />
           <input
             type="number"
@@ -92,12 +95,12 @@ const UpdateCracker = () => {
             value={cracker.stock}
             onChange={handleChange}
             placeholder="Stock Quantity"
-            className="mb-4 p-2 border border-gray-300 rounded-md w-full"
+            className="p-2 border border-gray-300 rounded-md w-full"
           />
         </div>
         <button
           type="submit"
-          className="bg-blue-500 text-white py-2 px-4 rounded-md"
+          className="mt-6 w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition"
         >
           Update Cracker
         </button>
